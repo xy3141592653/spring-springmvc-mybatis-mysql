@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:aop="http://www.springframework.org/schema/aop" 
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+        http://www.springframework.org/schema/aop 
+        http://www.springframework.org/schema/aop/spring-aop-4.0.xsd 
+        http://www.springframework.org/schema/tx  
+        http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+        
+    <!-- 指定从配置文件中加载数据库连接信息 -->
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <value>classpath:db.properties</value>
+        </property>
+        <property name="fileEncoding">
+            <value>UTF-8</value>
+        </property>
+    </bean>
+    
+    <!-- 配置数据源 也可以用dbcp、c3p0数据库连接池等，这里使用Spring默认的 -->
+    <!--  
+                使用连接池可以提高访问性能，这里可以加入dbcp或c3p0的jar包，并修改class实现
+        <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource.class">
+    -->        
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"></property>
+        <property name="url" value="${jdbc.url}"></property>
+        <property name="username" value="${jdbc.username}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+    </bean>
+    
+    <!-- 配置sqlSessionFactory -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 加载mybatis-config.xml文件 -->
+        <property name="configLocation" value="classpath:mybatis-config.xml"></property>
+        <!-- 数据源 -->
+        <property name="dataSource" ref="dataSource"></property>
+    </bean> 
+    
+    <!-- 扫描包中的mapper类 注意这里使用了sqlSessionFactoryBeanName 
+		 MapperScannerConfigurer 可以配置多个 ,MapperFactoryBean 需要一个一个的配 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.web.mapper"></property>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+    </bean>
+    
+    <!-- 对静态资源文件的访问  -->    
+    <mvc:resources mapping="/static/**" location="/static/" cache-period="31556926"/>
+    
+    <!-- 启用最新的注解解析器、映射器  -->
+    <!-- Spring默认情况下使用的是一些旧版本注解解析器、映射器、转换器等 -->
+    <mvc:annotation-driven/>    
+    
+    <!-- 扫描包中所有@Controller注解的类 -->     
+    <context:component-scan base-package="com.web.controller" />
+    <!-- 扫描包中所有@Service注解的类 -->
+    <context:component-scan base-package="com.web.service" />
+    
+    <!-- 配置视图解析器 -->
+    <!-- prefix和suffix：查找视图页面的前缀和后缀（前缀[逻辑视图名]后缀），
+                           比如传进来的逻辑视图名为WEB-INF/jsp/hello，则该该jsp视图页面应该存放在WEB-INF/jsp/hello.jsp -->          
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix"><value>/WEB-INF/jsp/</value></property>
+        <property name="suffix"><value>.jsp</value></property>
+    </bean>
+</beans>
