@@ -37,7 +37,7 @@ public class HelloController {
                 user.setName("查无记录");
             }
             
-            String myhtml = "<div><p>Hello World</P>";
+            String myhtml = "<div><p>这是html文本。</p><p>红色字体表明css样式文件成功加载。</p><p>这说明jsp上的数据可以由后台控制并显示</P></div><p></P>";
             // 在jsp文件中，可以通过${myhtml}得到myhtml的内容
             model.addAttribute("myhtml", myhtml);
             
