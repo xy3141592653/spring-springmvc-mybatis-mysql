@@ -10,6 +10,6 @@
     
     <select id="getUserById" parameterType="int" resultType="User"> 
         select * from t_user where id=#{id}
-    </select>    
+    </select>
 
 </mapper>
